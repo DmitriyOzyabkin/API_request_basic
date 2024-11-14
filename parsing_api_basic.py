@@ -13,8 +13,8 @@ from pprint import pprint
 endpoint = "https://api.foursquare.com/v3/places/search"
 
 # Определение параметров для запроса API
-city = 'Ufa' #input("Введите название города (ENG/РУС): ")
-fields = "name,rating,location"
+city = input("Введите название города (ENG/РУС): ")
+fields = "categories,name,rating,location"
 params = {"near": city,
           "fields": fields}
 
@@ -28,25 +28,32 @@ response = requests.get(endpoint, params=params, headers=headers)
 
 # Проверка успешности запроса API
 if response.status_code == 200:
-    print("Успешный запрос API!")
-
-# Компановка вывода
+    
+# Компановка данных
 
     data = json.loads(response.text)
-    # venues = data["results"]
-    # categories = [venue["categories"][0]["name"] for venue in venues]
 
-    # for category in categories:
-    #     print(category)
-    # for venue in venues:
-    #     print("Название:", venue["name"])
-    #     print("Адрес:", venue["location"]["address"])
-    #     print("\n")
-    # for venue in venues: 
-    #     pprint(venue['categories'][0]['name'])
+# Формирование запроса пользователю на выбор категории
+
+    venues = data["results"]
+    categories = set(venue["categories"][0]["name"] for venue in venues)
+    print(f"В городе {city} есть:")
+    print()
+    print(*categories, sep='\n')
+    print()
+    user_choise = input("Введите название категории для поиска: ").title()
+    print()
+# Вывод ответ пользователю
+    print(f'В выбранной категории {user_choise} найдено:')
+    print()
+    for venue in venues:
+        if venue["categories"][0]["name"] == user_choise:
+            print("Название:", venue["name"])
+            print("Рейтинг:", venue["rating"])
+            print("Адрес:", venue["location"]["formatted_address"])
+            print()
+    
 
 else:
     print("Запрос API завершился неудачей с кодом состояния:", response.status_code)
     print(response.text)
-
-pprint(data)
