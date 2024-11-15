@@ -7,7 +7,6 @@
 
 import requests
 import json
-from pprint import pprint
 
 # Конечная точка API
 endpoint = "https://api.foursquare.com/v3/places/search"
@@ -16,11 +15,12 @@ endpoint = "https://api.foursquare.com/v3/places/search"
 city = input("Введите название города (ENG/РУС): ")
 fields = "categories,name,rating,location"
 params = {"near": city,
-          "fields": fields}
+          "fields": fields,
+          "limit": 50}
 
 headers = {
     "Accept": "application/json",
-    "Authorization": "fsq3iqqZ4EkGp4yrlY3xU3Hmqsd+yNyeXFGabhLAxNo2+l4="
+    "Authorization": "fsq3W/r0QxmECG3mWEQIjFHnPrZ14YRDtn6AJsPryv6pBZM="
 }
 
 # Отправка запроса API и получение ответа
@@ -29,12 +29,9 @@ response = requests.get(endpoint, params=params, headers=headers)
 # Проверка успешности запроса API
 if response.status_code == 200:
     
-# Компановка данных
-
     data = json.loads(response.text)
 
 # Формирование запроса пользователю на выбор категории
-
     venues = data["results"]
     categories = set(venue["categories"][0]["name"] for venue in venues)
     print(f"В городе {city} есть:")
@@ -43,7 +40,8 @@ if response.status_code == 200:
     print()
     user_choise = input("Введите название категории для поиска: ").title()
     print()
-# Вывод ответ пользователю
+
+# Вывод ответа пользователю
     print(f'В выбранной категории {user_choise} найдено:')
     print()
     for venue in venues:
@@ -53,7 +51,7 @@ if response.status_code == 200:
             print("Адрес:", venue["location"]["formatted_address"])
             print()
     
-
+# Вывод ошибки
 else:
     print("Запрос API завершился неудачей с кодом состояния:", response.status_code)
     print(response.text)
